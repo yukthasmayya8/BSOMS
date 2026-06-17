@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSOMS - Bakery Shop Owner Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        input, select { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        h2 { font-size: 18px; margin-bottom: 15px; color: #1f2937; }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+        .badge-fresh { background: #dcfce7; color: #166534; }
+        .badge-expiring { background: #fef3c7; color: #92400e; }
+        .badge-expired { background: #fee2e2; color: #991b1b; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-approved { background: #dcfce7; color: #166534; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+        .flex { display: flex; gap: 10px; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .tab-btn { padding: 12px 24px; background: transparent; border: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { font-weight: 600; color: #374151; font-size: 12px; text-transform: uppercase; }
+        .loading { text-align: center; padding: 40px; color: #6b7280; }
+        .role-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea, #764ba2); }
+        .role-card { background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 90%; text-align: center; }
+        .role-btn { width: 100%; padding: 16px; margin-bottom: 10px; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; color: white; }
+        .stat-box { padding: 20px; border-radius: 12px; color: white; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: bold; }
+        .stat-label { font-size: 12px; opacity: 0.9; }
+        .item-row { padding: 15px; background: #f9fafb; border-radius: 10px; margin-bottom: 10px; }
+        .hidden { display: none !important; }
+        .header { background: linear-gradient(to right, #2563eb, #1e40af); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { margin: 0; }
+        .tabs-container { background: white; border-radius: 12px; padding: 10px; margin-bottom: 20px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://bthgiojjqnrvfzcduyui.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aGdpb2pqcW5ydmZ6Y2R1eXVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Nzg1NTcsImV4cCI6MjA5NzE1NDU1N30.2a8R2bY3Wk8uh2ANyQZgHwJYPUdLi1u1v5ZlDPbCKWc';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let state = {
+            user: null,
+            tab: 'dash',
+            lang: 'kn',
+            items: [],
+            bills: [],
+            workers: [],
+            leaves: [],
+            credits: [],
+            shelves: {},
+            wasteLog: [],
+            taxRate: 5,
+            cart: [],
+            loading: true
+        };
+
+        const t = {
+            en: {
+                title: 'BSOMS', welcome: 'Welcome to', fullName: 'Bakery Shop Owner Management System',
+                owner: 'Owner', staff: 'Staff', customer: 'Customer',
+                dash: 'Dashboard', inv: 'Inventory', bill: 'Billing', workers: 'Workers',
+                shelf: 'Shelf', analytics: 'Analytics', goodsIn: 'Goods In',
+                items: 'Items Total', lowStock: 'Low Stock', expiring: 'Expiring Today',
+                fresh: 'Fresh', expired: 'Expired', expiredItems: 'Expired Items',
+                generateBill: 'Generate Bill', clearCart: 'Clear', addToCart: 'Add to Cart',
+                itemName: 'Item Name', price: 'Price', qty: 'Qty', shelfId: 'Shelf ID',
+                expiryDate: 'Expiry Date', addStock: 'Add Stock', stockAdded: 'Stock added!',
+                billGenerated: 'Bill Generated!', total: 'Total', subtotal: 'Subtotal',
+                tax: 'Tax', emptyCart: 'Cart is empty', noItems: 'No items',
+                pending: 'Pending', approved: 'Approved', rejected: 'Rejected',
+                notPaid: 'Not Paid', paid: 'Paid', addWorker: 'Add Worker',
+                workerName: 'Worker Name', role: 'Role', applyLeave: 'Apply Leave',
+                leaveType: 'Leave Type', startDate: 'Start Date', endDate: 'End Date',
+                approve: 'Approve', reject: 'Reject', markPaid: 'Mark Paid',
+                logout: 'Logout', selectRole: 'Select your role', newWorker: 'New Worker',
+                sickLeave: 'Sick Leave', personalLeave: 'Personal Leave', casualLeave: 'Casual Leave',
+                noWaste: 'No waste', periodicWaste: 'Periodic Waste Analysis', totalLoss: 'Total Loss',
+                liveInventory: 'Live Inventory', filterAll: 'All', filterLowStock: 'Low Stock',
+                addShelf: 'Add Shelf', shelfItems: 'Items', save: 'Save', cancel: 'Cancel',
+                loading: 'Loading...', connectionError: 'Connection Error - Check Internet'
+            },
+            kn: {
+                title: 'BSOMS', welcome: 'ಸ್ವಾಗತ', fullName: 'ಬೇಕರಿ ಅಂಗಡಿ ಮಾಲೀಕರ ನಿರ್ವಹಣಾ ವ್ಯವಸ್ಥೆ',
+                owner: 'ಮಾಲೀಕರು', staff: 'ಸಿಬ್ಬಂದಿ', customer: 'ಗ್ರಾಹಕರು',
+                dash: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', inv: 'ದಾಸ್ತಾನು', bill: 'ಬಿಲ್ಲಿಂಗ್', workers: 'ಕಾರ್ಮಿಕರು',
+                shelf: 'ಶೆಲ್ಫ್', analytics: 'ವಿಶ್ಲೇಷಣೆ', goodsIn: 'ಸರಕು ಸೇರಿಸಿ',
+                items: 'ಒಟ್ಟು ವಸ್ತುಗಳು', lowStock: 'ಕಡಿಮೆ ಸ್ಟಾಕ್', expiring: 'ಇಂದು ಮುಗಿಯುತ್ತದೆ',
+                fresh: 'ತಾಜಾ', expired: 'ಹಾಳಾಗಿದೆ', expiredItems: 'ಹಾಳಾದ ವಸ್ತುಗಳು',
+                generateBill: 'ಬಿಲ್ ಉತ್ಪಾದಿಸಿ', clearCart: 'ತೆರವುಗೊಳಿಸಿ', addToCart: 'ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ',
+                itemName: 'ವಸ್ತುವಿನ ಹೆಸರು', price: 'ಬೆಲೆ', qty: 'ಪ್ರಮಾಣ', shelfId: 'ಶೆಲ್ಫ್ ID',
+                expiryDate: 'ಮುಗಿಯುವ ದಿನಾಂಕ', addStock: 'ಸ್ಟಾಕ್ ಸೇರಿಸಿ', stockAdded: 'ಸ್ಟಾಕ್ ಸೇರಿಸಲಾಗಿದೆ!',
+                billGenerated: 'ಬಿಲ್ ಉತ್ಪಾದಿಸಲಾಗಿದೆ!', total: 'ಒಟ್ಟು', subtotal: 'ಉಪಮೊತ್ತ',
+                tax: 'ತೆರಿಗೆ', emptyCart: 'ಕಾರ್ಟ್ ಖಾಲಿಯಾಗಿದೆ', noItems: 'ವಸ್ತುಗಳಿಲ್ಲ',
+                pending: 'ಬಾಕಿ', approved: 'ಅನುಮೋದಿಸಲಾಗಿದೆ', rejected: 'ತಿರಸ್ಕರಿಸಲಾಗಿದೆ',
+                notPaid: 'ಪಾವತಿಸಬೇಕಿದೆ', paid: 'ಪಾವತಿಸಲಾಗಿದೆ', addWorker: 'ಕಾರ್ಮಿಕ ಸೇರಿಸಿ',
+                workerName: 'ಕಾರ್ಮಿಕರ ಹೆಸರು', role: 'ಪಾತ್ರ', applyLeave: 'ರಜೆಗಾಗಿ ಅರ್ಜಿ',
+                leaveType: 'ರಜೆ ಪ್ರಕಾರ', startDate: 'ಪ್ರಾರಂಭ ದಿನಾಂಕ', endDate: 'ಅಂತ್ಯ ದಿನಾಂಕ',
+                approve: 'ಅನುಮೋದಿಸು', reject: 'ತಿರಸ್ಕರಿಸು', markPaid: 'ಪಾವತಿ ಎಂದು ಗುರುತಿಸಿ',
+                logout: 'ಲಾಗ್ ಔಟ್', selectRole: 'ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ', newWorker: 'ಹೊಸ ಕಾರ್ಮಿಕ',
+                sickLeave: 'ಅನಾರೋಗ್ಯ ರಜೆ', personalLeave: 'ವೈಯಕ್ತಿಕ ರಜೆ', casualLeave: 'ಸಾಮಾನ್ಯ ರಜೆ',
+                noWaste: 'ತ್ಯಾಜ್ಯವಿಲ್ಲ', periodicWaste: 'ಆವಧಿವಾರು ತ್ಯಾಜ್ಯ ವಿಶ್ಲೇಷಣೆ', totalLoss: 'ಒಟ್ಟು ನಷ್ಟ',
+                liveInventory: 'ದಾಸ್ತಾನು ಸ್ಥಿತಿ', filterAll: 'ಎಲ್ಲಾ', filterLowStock: 'ಕಡಿಮೆ ಸ್ಟಾಕ್',
+                addShelf: 'ಶೆಲ್ಫ್ ಸೇರಿಸಿ', shelfItems: 'ವಸ್ತುಗಳು', save: 'ಉಳಿಸಿ', cancel: 'ರದ್ದು',
+                loading: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...', connectionError: 'ಸಂಪರ್ಕ ದೋಷ - ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ'
+            }
+        };
+
+        function getText(key) {
+            return t[state.lang][key] || key;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function getItemStatus(expiryDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const exp = new Date(expiryDate);
+            exp.setHours(0, 0, 0, 0);
+            const diff = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+            if (diff < 0) return 'expired';
+            if (diff <= 2) return 'expiring';
+            return 'fresh';
+        }
+
+        async function fetchData() {
+            try {
+                state.loading = true;
+                render();
+
+                const [itemsRes, billsRes, workersRes, leavesRes, creditsRes, shelvesRes, wasteRes, settingsRes] = await Promise.all([
+                    supabase.from('items').select('*').order('date_added', { ascending: false }),
+                    supabase.from('bills').select('*').order('created_at', { ascending: false }),
+                    supabase.from('workers').select('*'),
+                    supabase.from('leaves').select('*'),
+                    supabase.from('credits').select('*'),
+                    supabase.from('shelves').select('*'),
+                    supabase.from('waste_log').select('*'),
+                    supabase.from('settings').select('*').single()
+                ]);
+
+                state.items = (itemsRes.data || []).map(i => ({
+                    ...i,
+                    dateAdded: i.date_added,
+                    expiryDate: i.expiry_date
+                }));
+                state.bills = (billsRes.data || []).map(b => ({ ...b, time: b.created_at }));
+                state.workers = workersRes.data || [];
+                state.leaves = (leavesRes.data || []).map(l => ({
+                    ...l,
+                    workerId: l.worker_id,
+                    startDate: l.start_date,
+                    endDate: l.end_date
+                }));
+                state.credits = (creditsRes.data || []).map(c => ({
+                    ...c,
+                    issueDate: c.issue_date,
+                    expiryDate: c.expiry_date
+                }));
+                const shelvesMap = {};
+                (shelvesRes.data || []).forEach(s => { shelvesMap[s.id] = s.items; });
+                state.shelves = shelvesMap;
+                state.wasteLog = (wasteRes.data || []).map(w => ({
+                    ...w,
+                    expiryDate: w.original_expiry_date,
+                    dateAdded: w.original_date_added,
+                    wasteDate: w.waste_date
+                }));
+                if (settingsRes.data) {
+                    state.lang = settingsRes.data.lang || 'kn';
+                    state.taxRate = settingsRes.data.tax_rate || 5;
+                }
+
+                state.loading = false;
+                render();
+            } catch (err) {
+                console.error('Fetch error:', err);
+                state.loading = false;
+                state.error = true;
+                render();
+            }
+        }
+
+        async function addStock(name, qty, price, shelf, expiryDate) {
+            const item = {
+                id: Date.now(),
+                name: name.trim(),
+                qty: parseInt(qty),
+                price: parseFloat(price),
+                shelf: shelf.toUpperCase().trim(),
+                date_added: new Date().toISOString(),
+                expiry_date: expiryDate
+            };
+            await supabase.from('items').insert([item]);
+            await fetchData();
+        }
+
+        async function generateBill() {
+            if (state.cart.length === 0) return;
+
+            let items = [...state.items];
+            for (const soldItem of state.cart) {
+                let remaining = soldItem.qty;
+                const batches = items
+                    .filter(i => i.name.toLowerCase() === soldItem.name.toLowerCase() && getItemStatus(i.expiryDate) !== 'expired')
+                    .sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+
+                for (const batch of batches) {
+                    if (remaining <= 0) break;
+                    const deduct = Math.min(batch.qty, remaining);
+                    batch.qty -= deduct;
+                    remaining -= deduct;
+
+                    if (batch.qty <= 0) {
+                        await supabase.from('items').delete().eq('id', batch.id);
+                    } else {
+                        await supabase.from('items').update({ qty: batch.qty }).eq('id', batch.id);
+                    }
+                }
+            }
+
+            const subtotal = state.cart.reduce((s, i) => s + i.price * i.qty, 0);
+            const tax = (subtotal * state.taxRate) / 100;
+            const total = subtotal + tax;
+
+            const bill = {
+                id: Date.now(),
+                items: state.cart,
+                subtotal, tax, total,
+                created_at: new Date().toISOString()
+            };
+            await supabase.from('bills').insert([bill]);
+
+            state.cart = [];
+            await fetchData();
+        }
+
+        async function addWorker(name, role) {
+            await supabase.from('workers').insert([{ id: Date.now(), name: name.trim(), role: role.trim() }]);
+            await fetchData();
+        }
+
+        async function applyLeave(workerId, type, startDate, endDate, note = '') {
+            const worker = state.workers.find(w => w.id === workerId);
+            if (!worker) return;
+
+            await supabase.from('leaves').insert([{
+                id: Date.now(),
+                worker_id: workerId,
+                worker: worker.name,
+                type, start_date: startDate, end_date: endDate, note,
+                status: 'Pending'
+            }]);
+            await fetchData();
+        }
+
+        async function handleLeaveAction(leaveId, action) {
+            const status = action === 'approve' ? 'Approved' : 'Rejected';
+            await supabase.from('leaves').update({ status }).eq('id', leaveId);
+            await fetchData();
+        }
+
+        async function updateCreditStatus(creditId, status) {
+            await supabase.from('credits').update({ status }).eq('id', creditId);
+            await fetchData();
+        }
+
+        async function markAsWaste(itemId) {
+            const item = state.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const wasteEntry = {
+                id: `waste-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                original_item_id: item.id,
+                name: item.name,
+                qty: item.qty,
+                price: item.price,
+                shelf: item.shelf,
+                original_date_added: item.dateAdded,
+                original_expiry_date: item.expiryDate,
+                waste_date: new Date().toISOString(),
+                loss_reason: 'Manual/Spoilage'
+            };
+
+            await supabase.from('waste_log').insert([wasteEntry]);
+            await supabase.from('items').delete().eq('id', itemId);
+            await fetchData();
+        }
+
+        async function addShelf(id, items) {
+            const shelfId = id.toUpperCase().trim();
+            const itemsArr = items.split(',').map(i => i.trim()).filter(i => i);
+            await supabase.from('shelves').insert([{ id: shelfId, items: itemsArr }]);
+            await fetchData();
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+
+            if (state.loading) {
+                app.innerHTML = `<div class="loading"><h2>${getText('loading')}</h2></div>`;
+                return;
+            }
+
+            if (state.error) {
+                app.innerHTML = `<div class="loading"><h2 style="color:#dc2626">${getText('connectionError')}</h2><button class="btn btn-primary" onclick="fetchData()">Retry</button></div>`;
+                return;
+            }
+
+            if (!state.user) {
+                renderRoleScreen(app);
+                return;
+            }
+
+            if (state.user === 'customer') {
+                renderCustomerView(app);
+                return;
+            }
+
+            renderMainView(app);
+        }
+
+        function renderRoleScreen(app) {
+            app.innerHTML = `
+                <div class="role-screen">
+                    <div class="role-card">
+                        <h1 style="margin-bottom:5px">${getText('welcome')}</h1>
+                        <h2 style="margin-bottom:20px;color:#6b7280">${getText('fullName')}</h2>
+                        <p style="margin-bottom:25px;color:#6b7280">${getText('selectRole')}</p>
+                        <button class="role-btn" style="background:linear-gradient(135deg,#667eea,#764ba2)" onclick="setUser('owner')">${getText('owner')}</button>
+                        <button class="role-btn" style="background:linear-gradient(135deg,#f093fb,#f5576c)" onclick="setUser('staff')">${getText('staff')}</button>
+                        <button class="role-btn" style="background:linear-gradient(135deg,#4facfe,#00f2fe)" onclick="setUser('customer')">${getText('customer')}</button>
+                        <button class="btn" style="margin-top:20px;width:100%" onclick="toggleLang()">${state.lang === 'en' ? 'ಕನ್ನಡ' : 'English'}</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCustomerView(app) {
+            const freshItems = state.items.filter(i => getItemStatus(i.expiryDate) !== 'expired' && i.qty > 0);
+            const menu = {};
+            freshItems.forEach(i => {
+                if (menu[i.name]) menu[i.name].qty += i.qty;
+                else menu[i.name] = { name: i.name, price: i.price, qty: i.qty };
+            });
+
+            app.innerHTML = `
+                <div class="container" style="padding-top:40px">
+                    <div class="card" style="text-align:center">
+                        <h1 style="margin-bottom:10px">${state.lang === 'en' ? 'Welcome to BSOMS!' : 'BSOMS ಗೆ ಸ್ವಾಗತ!'}</h1>
+                        <p style="color:#6b7280;margin-bottom:20px">${state.lang === 'en' ? 'Fresh baked goods available today' : 'ಇಂದು ಲಭ್ಯವಿರುವ ತಾಜಾ ಬೇಕರಿ ವಸ್ತುಗಳು'}</p>
+                    </div>
+                    <div class="grid">
+                        ${Object.values(menu).map(item => `
+                            <div class="card">
+                                <h3 style="margin-bottom:10px">${item.name}</h3>
+                                <p style="font-size:24px;font-weight:bold;color:#2563eb">${item.price}</p>
+                                <p style="color:#6b7280;font-size:12px">Available: ${item.qty}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${freshItems.length === 0 ? `<div class="card" style="text-align:center;color:#6b7280">${state.lang === 'en' ? 'No items available' : 'ಯಾವುದೇ ವಸ್ತುಗಳು ಲಭ್ಯವಿಲ್ಲ'}</div>` : ''}
+                    <button class="btn btn-primary" style="margin-top:20px;width:100%" onclick="setUser(null)">${getText('logout')}</button>
+                </div>
+            `;
+        }
+
+        function renderMainView(app) {
+            const freshItems = state.items.filter(i => getItemStatus(i.expiryDate) !== 'expired');
+            const lowStock = freshItems.filter(i => i.qty < 10);
+            const expiringToday = freshItems.filter(i => getItemStatus(i.expiryDate) === 'expiring');
+
+            const tabs = state.user === 'owner'
+                ? ['dash', 'goodsIn', 'inv', 'bill', 'workers', 'credit', 'shelf', 'analytics']
+                : ['dash', 'goodsIn', 'inv', 'bill', 'workers'];
+
+            const subtotal = state.cart.reduce((s, i) => s + i.price * i.qty, 0);
+            const tax = (subtotal * state.taxRate) / 100;
+            const total = subtotal + tax;
+
+            let tabContent = '';
+
+            if (state.tab === 'dash') {
+                const pendingLeaves = state.leaves.filter(l => l.status === 'Pending');
+                const unpaidCredits = state.credits.filter(c => c.status === 'Not Paid');
+
+                tabContent = `
+                    <div class="grid">
+                        <div class="stat-box" style="background:#2563eb">
+                            <div class="stat-value">${freshItems.length}</div>
+                            <div class="stat-label">${getText('items')}</div>
+                        </div>
+                        <div class="stat-box" style="background:#f59e0b">
+                            <div class="stat-value">${lowStock.length}</div>
+                            <div class="stat-label">${getText('lowStock')}</div>
+                        </div>
+                        <div class="stat-box" style="background:#dc2626">
+                            <div class="stat-value">${expiringToday.length}</div>
+                            <div class="stat-label">${getText('expiring')}</div>
+                        </div>
+                    </div>
+                    ${state.user === 'owner' && pendingLeaves.length > 0 ? `
+                        <div class="card">
+                            <h2>${getText('pending')} ${getText('workers')}</h2>
+                            ${pendingLeaves.map(l => `
+                                <div class="item-row flex-between">
+                                    <div><strong>${l.worker}</strong> - ${l.type} (${l.startDate})</div>
+                                    <div>
+                                        <button class="btn btn-success" style="padding:6px 12px" onclick="handleLeaveAction(${l.id},'approve')">${getText('approve')}</button>
+                                        <button class="btn btn-danger" style="padding:6px 12px" onclick="handleLeaveAction(${l.id},'reject')">${getText('reject')}</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${state.user === 'owner' && unpaidCredits.length > 0 ? `
+                        <div class="card">
+                            <h2>${getText('notPaid')}</h2>
+                            ${unpaidCredits.slice(0,5).map(c => `
+                                <div class="item-row flex-between">
+                                    <div><strong>${c.name}</strong> - ${getText('price')}: ${c.amt}</div>
+                                    <button class="btn btn-success" style="padding:6px 12px" onclick="updateCreditStatus(${c.id},'Paid')">${getText('markPaid')}</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="card">
+                        <h2>${getText('liveInventory')}</h2>
+                        <div class="grid">
+                            ${freshItems.slice(0, 12).map(i => `
+                                <div class="item-row">
+                                    <div class="flex-between">
+                                        <strong>${i.name}</strong>
+                                        <span class="badge badge-${getItemStatus(i.expiryDate)}">${getText(getItemStatus(i.expiryDate))}</span>
+                                    </div>
+                                    <small style="color:#6b7280">${getText('qty')}: ${i.qty} | ${getText('price')}: ${i.price}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (state.tab === 'goodsIn') {
+                tabContent = `
+                    <div class="card">
+                        <h2>${getText('addStock')}</h2>
+                        <input id="stockName" placeholder="${getText('itemName')}">
+                        <input id="stockQty" type="number" placeholder="${getText('qty')}">
+                        <input id="stockPrice" type="number" step="0.01" placeholder="${getText('price')}">
+                        <input id="stockShelf" placeholder="${getText('shelfId')}">
+                        <input id="stockExpiry" type="date" placeholder="${getText('expiryDate')}">
+                        <button class="btn btn-primary" onclick="handleAddStock()">${getText('addStock')}</button>
+                    </div>
+                    <div class="card">
+                        <h2>Recent Items</h2>
+                        ${state.items.slice(0, 5).map(i => `
+                            <div class="item-row flex-between">
+                                <div><strong>${i.name}</strong> - ${i.qty} @ ${i.price}</div>
+                                <small style="color:#6b7280">${i.shelf}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (state.tab === 'inv') {
+                tabContent = `
+                    <div class="card">
+                        <h2>${getText('inv')}</h2>
+                        ${freshItems.map(i => `
+                            <div class="item-row">
+                                <div class="flex-between">
+                                    <strong>${i.name}</strong>
+                                    <span class="badge badge-${getItemStatus(i.expiryDate)}">${getText(getItemStatus(i.expiryDate))}</span>
+                                </div>
+                                <div class="flex-between" style="margin-top:8px">
+                                    <span>${getText('qty')}: ${i.qty} | ${getText('price')}: ${i.price}</span>
+                                    <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="markAsWaste(${i.id})">Waste</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${freshItems.length === 0 ? `<p style="text-align:center;color:#6b7280">${getText('noItems')}</p>` : ''}
+                    </div>
+                `;
+            } else if (state.tab === 'bill') {
+                tabContent = `
+                    <div class="card">
+                        <h2>${getText('bill')}</h2>
+                        ${freshItems.map(i => `
+                            <div class="item-row flex-between">
+                                <div><strong>${i.name}</strong> - ${getText('price')}: ${i.price} (${getText('qty')}: ${i.qty})</div>
+                                <button class="btn btn-primary" style="padding:6px 12px" onclick="addToCart('${i.name}',${i.price})">+</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="card">
+                        <h2>Cart</h2>
+                        ${state.cart.length > 0 ? `
+                            ${state.cart.map((c, idx) => `
+                                <div class="item-row flex-between">
+                                    <div>${c.name} x ${c.qty} = ${c.price * c.qty}</div>
+                                    <button class="btn btn-danger" style="padding:4px 10px" onclick="removeFromCart(${idx})">X</button>
+                                </div>
+                            `).join('')}
+                            <div style="margin-top:15px">
+                                <p><strong>${getText('subtotal')}:</strong> ${subtotal.toFixed(2)}</p>
+                                <p><strong>${getText('tax')} (${state.taxRate}%):</strong> ${tax.toFixed(2)}</p>
+                                <p style="font-size:20px;margin-top:10px"><strong>${getText('total')}:</strong> ${total.toFixed(2)}</p>
+                            </div>
+                            <div class="flex" style="margin-top:15px">
+                                <button class="btn btn-success" onclick="generateBill()">${getText('generateBill')}</button>
+                                <button class="btn btn-danger" onclick="clearCart()">${getText('clearCart')}</button>
+                            </div>
+                        ` : `<p style="text-align:center;color:#6b7280">${getText('emptyCart')}</p>`}
+                    </div>
+                `;
+            } else if (state.tab === 'workers') {
+                tabContent = `
+                    <div class="card">
+                        <h2>${getText('workers')}</h2>
+                        ${state.workers.map(w => `
+                            <div class="item-row">
+                                <div class="flex-between">
+                                    <strong>${w.name}</strong>
+                                    <span class="badge" style="background:#e5e7eb">${w.role}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${state.user === 'owner' ? `
+                        <div class="card">
+                            <h2>${getText('newWorker')}</h2>
+                            <input id="workerName" placeholder="${getText('workerName')}">
+                            <input id="workerRole" placeholder="${getText('role')}">
+                            <button class="btn btn-primary" onclick="handleAddWorker()">${getText('addWorker')}</button>
+                        </div>
+                        <div class="card">
+                            <h2>${getText('pending')} ${getText('applyLeave')}</h2>
+                            ${state.leaves.filter(l => l.status === 'Pending').map(l => `
+                                <div class="item-row flex-between">
+                                    <div><strong>${l.worker}</strong> - ${l.type} (${l.startDate} to ${l.endDate})</div>
+                                    <div>
+                                        <button class="btn btn-success" style="padding:6px 12px" onclick="handleLeaveAction(${l.id},'approve')">${getText('approve')}</button>
+                                        <button class="btn btn-danger" style="padding:6px 12px" onclick="handleLeaveAction(${l.id},'reject')">${getText('reject')}</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="card">
+                        <h2>${getText('applyLeave')}</h2>
+                        <select id="leaveWorker">
+                            ${state.workers.map(w => `<option value="${w.id}">${w.name}</option>`).join('')}
+                        </select>
+                        <select id="leaveType">
+                            <option value="Sick">${getText('sickLeave')}</option>
+                            <option value="Personal">${getText('personalLeave')}</option>
+                            <option value="Casual">${getText('casualLeave')}</option>
+                        </select>
+                        <input id="leaveStart" type="date" placeholder="${getText('startDate')}">
+                        <input id="leaveEnd" type="date" placeholder="${getText('endDate')}">
+                        <button class="btn btn-primary" onclick="handleApplyLeave()">${getText('applyLeave')}</button>
+                    </div>
+                `;
+            } else if (state.tab === 'credit' && state.user === 'owner') {
+                tabContent = `
+                    <div class="card">
+                        <h2>Credits</h2>
+                        ${state.credits.map(c => `
+                            <div class="item-row flex-between">
+                                <div>
+                                    <strong>${c.name}</strong> - ${c.amt}
+                                    <span class="badge ${c.status === 'Paid' ? 'badge-approved' : 'badge-pending'}">${c.status === 'Paid' ? getText('paid') : getText('notPaid')}</span>
+                                </div>
+                                ${c.status !== 'Paid' ? `<button class="btn btn-success" style="padding:6px 12px" onclick="updateCreditStatus(${c.id},'Paid')">${getText('markPaid')}</button>` : ''}
+                            </div>
+                        `).join('')}
+                        ${state.credits.length === 0 ? `<p style="text-align:center;color:#6b7280">${getText('noItems')}</p>` : ''}
+                    </div>
+                `;
+            } else if (state.tab === 'shelf') {
+                tabContent = `
+                    <div class="card">
+                        <h2>${getText('shelf')}</h2>
+                        ${Object.entries(state.shelves).map(([id, items]) => `
+                            <div class="item-row">
+                                <strong style="color:#2563eb">${id}</strong>
+                                <div style="color:#6b7280;margin-top:8px">${(items || []).join(', ')}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="card">
+                        <h2>${getText('addShelf')}</h2>
+                        <input id="shelfId" placeholder="${getText('shelfId')}">
+                        <input id="shelfItems" placeholder="${getText('shelfItems')} (comma separated)">
+                        <button class="btn btn-primary" onclick="handleAddShelf()">${getText('addShelf')}</button>
+                    </div>
+                `;
+            } else if (state.tab === 'analytics' && state.user === 'owner') {
+                const today = new Date();
+                const periods = [
+                    { label: '7 Days', days: 7 },
+                    { label: '15 Days', days: 15 },
+                    { label: '30 Days', days: 30 }
+                ];
+
+                tabContent = `
+                    <div class="card">
+                        <h2>${getText('periodicWaste')}</h2>
+                        ${periods.map(period => {
+                            const start = new Date(today);
+                            start.setDate(start.getDate() - period.days);
+                            const wasteItems = state.wasteLog.filter(w => new Date(w.wasteDate) >= start);
+                            const loss = wasteItems.reduce((sum, w) => sum + (w.qty * w.price || 0), 0);
+
+                            return `
+                                <div class="item-row" style="border-left:4px solid ${loss > 0 ? '#dc2626' : '#16a34a'}">
+                                    <div class="flex-between">
+                                        <div>
+                                            <h4>${period.label}</h4>
+                                            <small style="color:#6b7280">Since ${formatDate(start)}</small>
+                                        </div>
+                                        <div style="text-align:right">
+                                            <div style="font-size:20px;font-weight:bold;color:${loss > 0 ? '#dc2626' : '#16a34a'}">${loss.toFixed(0)}</div>
+                                        </div>
+                                    </div>
+                                    ${wasteItems.length > 0 ? `
+                                        <div style="margin-top:10px;color:#6b7280">
+                                            ${wasteItems.slice(0, 3).map(w => `${w.name} x${w.qty}`).join(', ')}
+                                        </div>
+                                    ` : `<div style="margin-top:10px;color:#6b7280">${getText('noWaste')}</div>`}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            app.innerHTML = `
+                <div class="container">
+                    <div class="header flex-between">
+                        <div>
+                            <h1>${getText('title')}</h1>
+                            <span>${state.user === 'owner' ? getText('owner') : getText('staff')}</span>
+                        </div>
+                        <div>
+                            <button class="btn" style="background:rgba(255,255,255,0.2);color:white" onclick="toggleLang()">${state.lang === 'en' ? 'ಕನ್ನಡ' : 'Eng'}</button>
+                            <button class="btn btn-danger" style="margin-left:10px" onclick="setUser(null)">${getText('logout')}</button>
+                        </div>
+                    </div>
+                    <div class="tabs-container flex">
+                        ${tabs.map(t => `<button class="tab-btn ${state.tab === t ? 'active' : ''}" onclick="setTab('${t}')">${getText(t)}</button>`).join('')}
+                    </div>
+                    ${tabContent}
+                </div>
+            `;
+        }
+
+        // Event handlers
+        function setUser(role) {
+            state.user = role;
+            state.tab = 'dash';
+            state.cart = [];
+            render();
+        }
+
+        function setTab(tab) {
+            state.tab = tab;
+            render();
+        }
+
+        function toggleLang() {
+            state.lang = state.lang === 'en' ? 'kn' : 'en';
+            supabase.from('settings').update({ lang: state.lang }).eq('id', 1).then(() => render());
+        }
+
+        function addToCart(name, price) {
+            const existing = state.cart.find(c => c.name === name);
+            if (existing) {
+                existing.qty++;
+            } else {
+                state.cart.push({ name, price, qty: 1 });
+            }
+            render();
+        }
+
+        function removeFromCart(idx) {
+            state.cart.splice(idx, 1);
+            render();
+        }
+
+        function clearCart() {
+            state.cart = [];
+            render();
+        }
+
+        async function handleAddStock() {
+            const name = document.getElementById('stockName').value;
+            const qty = document.getElementById('stockQty').value;
+            const price = document.getElementById('stockPrice').value;
+            const shelf = document.getElementById('stockShelf').value;
+            const expiry = document.getElementById('stockExpiry').value;
+
+            if (!name || !qty || !price || !shelf || !expiry) {
+                alert(state.lang === 'en' ? 'Please fill all fields' : 'ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ');
+                return;
+            }
+
+            await addStock(name, qty, price, shelf, expiry);
+        }
+
+        async function handleAddWorker() {
+            const name = document.getElementById('workerName').value;
+            const role = document.getElementById('workerRole').value;
+            if (!name || !role) {
+                alert(state.lang === 'en' ? 'Please fill all fields' : 'ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ');
+                return;
+            }
+            await addWorker(name, role);
+        }
+
+        async function handleApplyLeave() {
+            const workerId = parseInt(document.getElementById('leaveWorker').value);
+            const type = document.getElementById('leaveType').value;
+            const startDate = document.getElementById('leaveStart').value;
+            const endDate = document.getElementById('leaveEnd').value;
+
+            if (!workerId || !type || !startDate || !endDate) {
+                alert(state.lang === 'en' ? 'Please fill all fields' : 'ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ');
+                return;
+            }
+
+            await applyLeave(workerId, type, startDate, endDate);
+        }
+
+        async function handleAddShelf() {
+            const id = document.getElementById('shelfId').value;
+            const items = document.getElementById('shelfItems').value;
+            if (!id || !items) {
+                alert(state.lang === 'en' ? 'Please fill all fields' : 'ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ');
+                return;
+            }
+            await addShelf(id, items);
+        }
+
+        // Initialize
+        fetchData();
+    </script>
+</body>
+</html>

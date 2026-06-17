@@ -1,0 +1,221 @@
+h1,
+p {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+/* ==========================================================================
+   BSOMS Premium Styling Layer (Designed for Inline-Style Harmony)
+   ========================================================================== */
+   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+   /* Master variables that cascade perfectly alongside inline styles */
+   :root {
+       --bg-workspace: #f8fafc;
+       --text-primary: #0f172a;
+       --text-secondary: #64748b;
+       --primary-indigo: #6366f1;
+       --border-smooth: #edf2f7;
+       --glass-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+       --premium-radius: 16px;
+       
+       /* Freshness & Financial Status Accent Variables */
+       --clr-fresh: #10b981;
+       --clr-expiring: #f59e0b;
+       --clr-expired: #ef4444;
+   }
+   
+   /* Base Body Styling Reset */
+   body {
+       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+       background-color: var(--bg-workspace);
+       color: var(--text-primary);
+       margin: 0;
+       padding: 0;
+       -webkit-font-smoothing: antialiased;
+       -moz-osx-font-smoothing: grayscale;
+   }
+   
+   /* Ensure global typography uniformity across React component trees */
+   button, input, select, textarea, span, div, p, h1, h2, h3, th, td {
+       font-family: 'Plus Jakarta Sans', sans-serif !important;
+   }
+   
+   /* ==========================================================================
+      Structural Layout & Container Wrappers
+      ========================================================================== */
+   /* Automatically stabilizes grid containers across screens */
+   div[style*="max-width"][style*="margin: '0 auto'"] {
+       max-width: 1280px !important;
+       padding: 24px !important;
+   }
+   
+   /* Flex Grid alignment for your layout dashboard cards */
+   div[style*="display: 'flex'"][style*="gap: '20px'"],
+   div[style*="display: flex"][style*="gap: 20px"] {
+       gap: 24px !important;
+   }
+   
+   /* ==========================================================================
+      Role Selection Portal Overlay (Initial Screen)
+      ========================================================================== */
+   div[style*="background: 'linear-gradient"] {
+       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+       position: relative;
+       overflow: hidden;
+   }
+   
+   /* Login Card Accent Elements */
+   div[style*="boxShadow: '0 24px 64px"] {
+       border: 1px solid rgba(255, 255, 255, 0.7);
+       box-shadow: 0 30px 70px rgba(15, 23, 42, 0.15) !important;
+       border-radius: 24px !important;
+   }
+   
+   /* Hover scales for Role Selection list parameters */
+   div[style*="boxShadow: '0 24px 64px"] button[style*="background: 'linear-gradient"] {
+       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease !important;
+   }
+   
+   div[style*="boxShadow: '0 24px 64px"] button[style*="background: 'linear-gradient"]:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 12px 24px -6px rgba(79, 70, 229, 0.3) !important;
+       filter: brightness(1.05);
+   }
+   
+   /* ==========================================================================
+      Navigation Bars, Active States, and Tabs
+      ========================================================================== */
+   /* Targets the wrapper component tracking state switches */
+   button[style*="cursor: 'pointer'"] {
+       border-radius: 10px !important;
+       font-size: 14px !important;
+       font-weight: 600 !important;
+       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+   }
+   
+   /* Handles active/inactive navigation item transformations smoothly */
+   button[style*="#4f46e5"]:hover, button[style*="#6366f1"]:hover {
+       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+   }
+   
+   /* ==========================================================================
+      Advanced Input Controls & Field Boxes
+      ========================================================================== */
+   input, select, textarea {
+       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+       border: 1px solid #cbd5e1 !important;
+   }
+   
+   input:focus, select:focus, textarea:focus {
+       background-color: #ffffff !important;
+       border-color: var(--primary-indigo) !important;
+       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12) !important;
+       outline: none !important;
+   }
+   
+   /* Placeholder font layout adjustment */
+   ::placeholder {
+       color: #94a3b8;
+       opacity: 1;
+   }
+   
+   /* ==========================================================================
+      Data Presentation Elements (Tables)
+      ========================================================================== */
+   table {
+       width: 100%;
+       border-collapse: separate !important;
+       border-spacing: 0 !important;
+       margin-top: 12px;
+   }
+   
+   th {
+       text-transform: uppercase !important;
+       font-size: 11px !important;
+       font-weight: 700 !important;
+       color: var(--text-secondary) !important;
+       letter-spacing: 0.06em !important;
+       padding: 14px 16px !important;
+       background-color: #f8fafc;
+       border-bottom: 2px solid var(--border-smooth) !important;
+   }
+   
+   td {
+       padding: 14px 16px !important;
+       border-bottom: 1px solid #f1f5f9 !important;
+       color: #334155 !important;
+       font-size: 14px !important;
+   }
+   
+   tr {
+       transition: background-color 0.2s ease;
+   }
+   
+   tr:hover td {
+       background-color: #f8fafc !important;
+   }
+   
+   /* Round off table bounds clean */
+   tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+   tr:last-child td:last-child { border-bottom-right-radius: 12px; }
+   
+   /* ==========================================================================
+      Interactive Component Elevations (Cards & Buttons)
+      ========================================================================== */
+   /* Selects any element displaying your primary s.card attributes */
+   div[style*="boxShadow"][style*="background: '#fff'"],
+   div[style*="boxShadow"][style*="background: rgb(255, 255, 255)"],
+   div[style*="box-shadow"][style*="background: rgb(255, 255, 255)"] {
+       box-shadow: var(--glass-shadow) !important;
+       border: 1px solid rgba(226, 232, 240, 0.6) !important;
+       border-radius: var(--premium-radius) !important;
+       transition: transform 0.3s ease, box-shadow 0.3s ease;
+   }
+   
+   /* Standard Button Structural Overlays */
+   button {
+       letter-spacing: -0.01em;
+       font-weight: 600 !important;
+       transition: all 0.2s ease-in-out !important;
+   }
+   
+   button:active {
+       transform: scale(0.97) !important;
+   }
+   
+   /* Reusable small analytical display widgets (`StatBox`) adjustment */
+   div[style*="borderRadius: '12px'"][style*="padding: '20px'"] {
+       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+       position: relative;
+       overflow: hidden;
+   }
+   
+   div[style*="borderRadius: '12px'"][style*="padding: '20px'"]::after {
+       content: '';
+       position: absolute;
+       top: 0; right: 0; bottom: 0; left: 0;
+       background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+       pointer-events: none;
+   }
+   
+   /* ==========================================================================
+      Scrollbars & Badges
+      ========================================================================== */
+   ::-webkit-scrollbar {
+       width: 6px;
+       height: 6px;
+   }
+   
+   ::-webkit-scrollbar-track {
+       background: transparent;
+   }
+   
+   ::-webkit-scrollbar-thumb {
+       background: #cbd5e1;
+       border-radius: 20px;
+   }
+   
+   ::-webkit-scrollbar-thumb:hover {
+       background: #94a3b8;
+   }
+   
