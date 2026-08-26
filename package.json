@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
-    "frontend": "vite",
-    "backend": "node server.js",
+    "start": "node server/index.js",
+    "frontend": "vite --config client/vite.config.js",
+    "backend": "node server/index.js",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "build": "vite build",
+    "build": "vite build --config client/vite.config.js",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview --config client/vite.config.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

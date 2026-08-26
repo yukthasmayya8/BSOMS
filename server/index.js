@@ -6,9 +6,11 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const clientDistPath = path.resolve(__dirname, '../dist');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(clientDistPath));
 
 // Persistent Embedded JSON Datastores
 const db = {
@@ -26,27 +28,27 @@ const db = {
 async function seedDatabase() {
     if (await db.items.count({}) === 0) {
         await db.items.insert([
-            { id: 1, name: 'Bread', qty: 45, price: 40, shelf: 'A1', dateAdded: '2025-12-05T00:00:00.000Z', expiryDate: '2025-12-16' }, 
-            { id: 2, name: 'Cake', qty: 8, price: 250, shelf: 'B2', dateAdded: '2025-12-03T00:00:00.000Z', expiryDate: '2025-12-15' }, 
-            { id: 3, name: 'Cookies', qty: 15, price: 80, shelf: 'A2', dateAdded: '2025-10-08T00:00:00.000Z', expiryDate: '2025-11-02' }, 
+            { id: 1, name: 'Bread', qty: 45, price: 40, shelf: 'A1', dateAdded: '2025-12-05T00:00:00.000Z', expiryDate: '2025-12-16' },
+            { id: 2, name: 'Cake', qty: 8, price: 250, shelf: 'B2', dateAdded: '2025-12-03T00:00:00.000Z', expiryDate: '2025-12-15' },
+            { id: 3, name: 'Cookies', qty: 15, price: 80, shelf: 'A2', dateAdded: '2025-10-08T00:00:00.000Z', expiryDate: '2025-11-02' },
             { id: 4, name: 'Muffin Mix', qty: 5, price: 120, shelf: 'C1', dateAdded: '2025-08-28T00:00:00.000Z', expiryDate: '2025-09-02' }
         ]);
     }
     if (await db.workers.count({}) === 0) {
         await db.workers.insert([
-            { id: 101, name: 'Manjunath', role: 'Baker' }, 
-            { id: 102, name: 'Suresh', role: 'Helper'}
+            { id: 101, name: 'Manjunath', role: 'Baker' },
+            { id: 102, name: 'Suresh', role: 'Helper' }
         ]);
     }
     if (await db.leaves.count({}) === 0) {
         await db.leaves.insert([
-            { id: 1, workerId: 101, worker: 'Manjunath', type: 'Sick', startDate: '2025-11-23', endDate: '2025-11-24', status: 'Approved' }, 
+            { id: 1, workerId: 101, worker: 'Manjunath', type: 'Sick', startDate: '2025-11-23', endDate: '2025-11-24', status: 'Approved' },
             { id: 2, workerId: 102, worker: 'Suresh', type: 'Personal', startDate: '2025-12-20', endDate: '2025-12-21', status: 'Pending' }
         ]);
     }
     if (await db.credits.count({}) === 0) {
         await db.credits.insert([
-            { id: 1, name: 'Ravi Kumar', amt: 450, issueDate: '2026-06-16', expiryDate: '2026-07-16', status: 'Not Paid' }, 
+            { id: 1, name: 'Ravi Kumar', amt: 450, issueDate: '2026-06-16', expiryDate: '2026-07-16', status: 'Not Paid' },
             { id: 2, name: 'Suma', amt: 120, issueDate: '2026-05-07', expiryDate: '2026-06-06', status: 'Not Paid' }
         ]);
     }
@@ -114,7 +116,7 @@ app.post('/api/inventory/add', async (req, res) => {
         const { name, qty, price, shelf, expiryDate } = req.body;
         const shelfIdUpper = shelf.toUpperCase().trim();
         const itemNameClean = name.trim();
-        const generatedId = Date.now(); 
+        const generatedId = Date.now();
 
         const newItem = {
             id: generatedId,
@@ -145,17 +147,17 @@ app.post('/api/inventory/add', async (req, res) => {
 
 app.post('/api/inventory/waste/:id', async (req, res) => {
     try {
-        const itemId = parseInt(req.params.id); 
+        const itemId = parseInt(req.params.id);
         const item = await db.items.findOne({ id: itemId });
         if (!item) return res.status(404).json({ error: 'Item record not found' });
 
         const wasteEntry = {
             ...item,
-            id: `waste-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
+            id: `waste-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             wasteDate: new Date().toISOString(),
             lossReason: 'Manual/Spoilage'
         };
-        delete wasteEntry._id; 
+        delete wasteEntry._id;
 
         await db.wasteLog.insert(wasteEntry);
         await db.items.remove({ id: itemId });
@@ -186,7 +188,7 @@ app.post('/api/bills/generate', async (req, res) => {
             for (let current of batches) {
                 if (remainingQty <= 0) break;
 
-                const isExpired = new Date(current.expiryDate).setHours(0,0,0,0) <= new Date().setHours(0,0,0,0);
+                const isExpired = new Date(current.expiryDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0);
                 if (!isExpired) {
                     const deductQty = Math.min(current.qty, remainingQty);
                     current.qty -= deductQty;
@@ -256,7 +258,7 @@ app.post('/api/workers/add', async (req, res) => {
     try {
         const { name, role } = req.body;
         const worker = {
-            id: Date.now(), 
+            id: Date.now(),
             name: name.trim(),
             role: role.trim()
         };
@@ -311,7 +313,7 @@ app.post('/api/leaves/apply', async (req, res) => {
 app.patch('/api/leaves/:id/action', async (req, res) => {
     try {
         const leaveId = parseInt(req.params.id);
-        const { action } = req.body; 
+        const { action } = req.body;
         const status = action === 'approve' ? 'Approved' : 'Rejected';
 
         await db.leaves.update({ id: leaveId }, { $set: { status } });
@@ -321,6 +323,11 @@ app.patch('/api/leaves/:id/action', async (req, res) => {
     }
 });
 
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
 /* ==========================================================================
    7. SHELF CONFIGURATION
    ========================================================================== */
@@ -328,7 +335,7 @@ app.post('/api/shelves/add', async (req, res) => {
     try {
         const { id, items } = req.body;
         const shelfIdUpper = id.toUpperCase().trim();
-        
+
         const existing = await db.shelves.findOne({ id: shelfIdUpper });
         if (existing) return res.status(400).json({ error: 'Shelf ID already exists!' });
 
