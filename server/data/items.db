@@ -1,0 +1,4 @@
+{"id":3,"name":"Cookies","qty":15,"price":80,"shelf":"A2","dateAdded":"2025-10-08T00:00:00.000Z","expiryDate":"2025-11-02","_id":"9DDzUPQ74RBYkhvt"}
+{"id":2,"name":"Cake","qty":8,"price":250,"shelf":"B2","dateAdded":"2025-12-03T00:00:00.000Z","expiryDate":"2025-12-15","_id":"DD6KdhL7S0crXTUH"}
+{"id":4,"name":"Muffin Mix","qty":5,"price":120,"shelf":"C1","dateAdded":"2025-08-28T00:00:00.000Z","expiryDate":"2025-09-02","_id":"juRMLkWNTdpE3c5q"}
+{"id":1,"name":"Bread","qty":45,"price":40,"shelf":"A1","dateAdded":"2025-12-05T00:00:00.000Z","expiryDate":"2025-12-16","_id":"yR2fc0qQ2Qgw2ezY"}

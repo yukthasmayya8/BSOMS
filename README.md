@@ -26,4 +26,8 @@ The Express server serves the built client from `dist/` and exposes the API unde
 - `server/` - Express API and local persistence setup
 - `legacy/` - Original standalone HTML client kept for reference
 - `dist/` - Generated production build, ignored by Git
-- `data/` - Runtime local database files, ignored by Git
+- `server/data/` - Local NeDB database files, tracked for inspection and backup
+
+The database files use one JSON record per line. When records change, commit the
+updated files in `server/data/` to keep the local data snapshot available for
+future review.
