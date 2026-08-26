@@ -1,92 +1,81 @@
 BSOMS — Bakery Shop Owner Management System
 
-BSOMS (Bakery Shop Owner Management System) is a web-based application developed to help bakery owners manage their day-to-day operations in a simple and organized manner.
+A web-based bakery management system developed to help bakery owners organize inventory, sales, customer credit, expiry tracking, and other day-to-day operations.
 
 About the Project
 
-Small bakery businesses often rely on manual methods for managing inventory, sales, customer credit, and product expiry. This can make it difficult to keep track of stock, payments, and wastage.
+Small bakery businesses often manage their inventory, sales, expiry dates, and customer credit through manual records. This can make it difficult to keep track of stock, pending payments, and product wastage.
 
-BSOMS aims to provide a centralized system for managing these operations digitally.
-
-The project was developed as a college project using React, Node.js, Express.js, and NeDB.
+BSOMS was developed as a college project to bring these operations together into a single system and provide a more organized way to manage bakery activities.
 
 Features
 
-- Inventory management
-- Stock tracking
-- Product expiry tracking
-- Billing and sales management
-- Customer credit and dues tracking
-- Waste and sales analysis
-- Production planning support
+Inventory Management
 
-Technologies Used
+Allows bakery owners to manage products and keep track of available stock.
 
-- Frontend: React, Vite, JavaScript, HTML, CSS
-- Backend: Node.js, Express.js
-- Database: NeDB
+Expiry Tracking
 
-Project Structure
+Helps monitor product expiry dates and identify items that require attention.
+
+Billing and Sales
+
+Provides functionality for recording sales and managing billing-related operations.
+
+Credit Management
+
+Keeps track of customer credit and outstanding dues.
+
+Waste and Sales Analysis
+
+Provides information that can help understand sales and identify potential inventory wastage.
+
+Production Planning
+
+Supports planning of bakery production based on inventory and sales information.
+
+Technology
+
+Frontend: React, Vite, JavaScript, HTML, CSS
+
+Backend: Node.js, Express.js
+
+Database: NeDB
+
+Development: Git, GitHub, npm
+
+About the System
+
+The system follows a client-server architecture.
+
+The React-based client provides the user interface, while the Node.js and Express.js server handles the backend operations. NeDB is used for local data storage.
+
+The project also contains an earlier version of the application in the "legacy" directory, which represents the initial implementation before the current React-based version.
+
+Repository Structure
 
 BSOMS/
-├── client/       # React frontend
-├── server/       # Express backend
-├── legacy/       # Earlier version of the project
-├── package.json
-├── package-lock.json
-└── README.md
 
-The "legacy" folder contains the earlier version of the project developed before the current React-based implementation.
+client/
+    React frontend
 
-How to Run
+server/
+    Express backend
+    Data storage
 
-Prerequisites
+legacy/
+    Earlier version of the project
 
-- Node.js
-- npm
+package.json
+package-lock.json
+README.md
 
-Installation
+Project Objective
 
-Clone the repository:
+The objective of BSOMS is to develop a practical software solution for managing common bakery operations and to explore the development of a full-stack web application.
 
-git clone https://github.com/yukthasmayya8/BSOMS.git
-cd BSOMS
+Note
 
-Install the required dependencies:
+BSOMS is a college project developed for learning and experimentation with frontend development, backend development, database handling, and application architecture.
 
-npm install
-
-Install the client dependencies:
-
-cd client
-npm install
-cd ..
-
-Run the Project
-
-npm run dev
-
-The application can then be accessed through the local development URL shown in the terminal.
-
-Project Status
-
-This project is currently a prototype developed as part of our college project.
-
-The system focuses on integrating the major operations involved in bakery management into a single application.
-
-Future Improvements
-
-- Barcode and QR code-based inventory management
-- Improved sales and waste analytics
-- Advanced production planning
-- User authentication and role-based access
-- Cloud database integration
-- Deployment for real-world use
-
-Team
-
-BSOMS was developed as a collaborative college project by our team.
-
-Repository
-
-"GitHub Repository" (https://github.com/yukthasmayya8/BSOMS)
+The project is an evolving prototype and is not intended to represent a production-ready commercial bakery management system.
