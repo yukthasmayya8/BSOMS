@@ -1,8 +1,8 @@
 # BSOMS — Bakery Shop Owner Management System
 
-BSOMS is a full-stack web application designed to help small bakery businesses manage everyday operations from a single platform. It brings inventory, billing, customer credit, expiry tracking, workforce management, production planning, and waste monitoring together in one system.
+BSOMS is a full-stack web application designed to help small bakery businesses manage everyday operations from a single platform. It brings inventory, billing, customer credit, expiry tracking, worker management, waste monitoring, and shelf organization together in one system.
 
-> **Project status:** BSOMS is an educational prototype developed as a college project with assistance from AI tools. It is intended for learning, experimentation, and demonstration rather than production use.
+> **Project status:** BSOMS is an educational prototype developed as a team project for the **Introduction to Design Thinking (IDT) course during the first year of engineering**. The project was created for learning, experimentation, and demonstrating software-development concepts.
 
 ## Overview
 
@@ -28,6 +28,21 @@ BSOMS addresses these challenges through a centralized client-server application
 - **Backend:** Node.js and Express.js
 - **Database:** NeDB with persistent local data files
 - **Development tools:** ESLint and Concurrently
+
+## Academic Context
+
+BSOMS was developed as a **team project for the Introduction to Design Thinking (IDT) course during the first year of engineering**.
+
+The project followed a problem-oriented approach to understand common challenges faced by small bakery businesses and design a practical software solution for organizing their daily operations.
+
+## AI-Assisted Development
+
+Development of BSOMS was supported by AI-assisted tools, including:
+
+- **Google Gemini** — Used for ideation, problem-solving, code assistance, and exploring implementation approaches.
+- **StackBlitz AI** — Used for project prototyping, development assistance, and improving the application workflow.
+
+AI tools were used as development assistants rather than substitutes for the project team's design decisions, implementation, testing, and review. All generated suggestions and code were reviewed and adapted by the team based on the project's requirements.
 
 ## Project Structure
 
@@ -145,7 +160,7 @@ Because the data is stored locally:
 
 ## Contributing
 
-This project is primarily maintained as an educational project. If you would like to suggest an improvement:
+This project was developed as an academic team project. If you would like to suggest an improvement:
 
 1. Fork the repository.
 2. Create a feature branch.
