@@ -1,62 +1,95 @@
-BSOMS — Bakery Shop Owner Management System
+# BSOMS — Bakery Shop Owner Management System
 
-A web-based bakery management system developed as a college project with AI-assisted development to organize day-to-day operations such as inventory, billing, credit management, expiry tracking, and production planning.
+BSOMS is a full-stack web application designed to help small bakery businesses manage daily operations from a single platform. It centralizes inventory tracking, billing, credit records, expiry monitoring, and production-related workflows.
 
-About the Project
+## Project Overview
 
-Small bakery businesses often rely on manual methods to manage inventory, sales, customer credit, and product expiry. This can make it difficult to keep track of stock, pending payments, and wastage.
-                 BSOMS was developed to bring these operations together into a centralized system and provide a more organized approach to bakery management.
+Many small bakeries still depend on manual registers or disconnected tools, which can lead to stock mismatches, delayed collections, and avoidable product wastage. BSOMS addresses this by providing a unified workflow for operational visibility and decision support.
 
-Features
+## Key Features
 
-• Inventory Management:- A system for managing bakery products and keeping track of available stock.
+- **Inventory Management**: Track products, quantities, pricing, and shelf allocation.
+- **Expiry Tracking**: Monitor expiry dates and identify at-risk stock.
+- **Billing and Sales**: Generate and store bills with automated stock deduction.
+- **Credit Management**: Maintain customer credit records and payment status.
+- **Waste and Sales Insights**: Review wastage and sales activity for better planning.
+- **Production Planning Support**: Use current inventory and sales patterns to guide production.
+- **Worker and Leave Management**: Manage worker profiles and leave requests.
 
-• Expiry Tracking:- Helps monitor product expiry dates and identify items that require attention.
+## Tech Stack
 
-• Billing and Sales:- Provides functionality for recording sales and managing billing operations.
+- **Frontend**: React, Vite, JavaScript, HTML, CSS
+- **Backend**: Node.js, Express.js
+- **Database**: NeDB (embedded file-based datastore)
 
-• Credit Management:- Maintains customer credit records and helps track outstanding dues.
+## System Architecture
 
-• Waste and Sales Analysis:- Provides information about sales and inventory to help identify potential wastage and understand business activity.
+BSOMS uses a client-server architecture:
 
-• Production Planning:- Supports production planning using inventory and sales information.
+- The React frontend delivers the user interface.
+- The Express backend exposes API endpoints and handles business logic.
+- NeDB persists operational records locally on the server.
 
-Technology
+The `legacy/` folder contains an older version of the application that predates the current React-based implementation.
 
-- Frontend: React, Vite, JavaScript, HTML, CSS
-- Backend: Node.js, Express.js
-- Database: NeDB
+## Run the Project Locally
 
-About the System
+### Prerequisites
 
-BSOMS follows a client-server architecture. The React frontend provides the user interface, while the Node.js and Express.js backend handles application operations and communication with the database.
+- Node.js 18+ (recommended)
+- npm 9+ (recommended)
 
-NeDB is used for local data storage.
+### 1) Install dependencies
 
-The "legacy" folder contains an earlier version of the system developed before the current React-based implementation.
+From the repository root:
 
-Repository Structure
+```bash
+npm install
+```
 
+### 2) Start in development mode
+
+Run frontend and backend together:
+
+```bash
+npm run dev
+```
+
+This starts:
+- Backend API server on `http://localhost:5000` (default)
+- Frontend dev server on Vite’s default local port (typically `http://localhost:5173`)
+
+### 3) Optional: Run frontend and backend separately
+
+```bash
+npm run backend
+npm run frontend
+```
+
+### 4) Build and run production bundle locally
+
+```bash
+npm run build
+npm start
+```
+
+The backend serves the built frontend from the `dist/` directory.
+
+## Repository Structure
+
+```text
 BSOMS/
+├── client/        # React frontend (Vite root)
+├── server/        # Express backend, APIs, and datastore files
+├── legacy/        # Earlier implementation
+├── package.json
+└── README.md
+```
 
-    client/
-        React frontend
+## Project Goal
 
-    server/
-        Express backend
-        Data handling
+This project was built to deliver a practical bakery operations system while strengthening full-stack engineering skills across frontend development, backend API design, and data management.
 
-    legacy/
-        Earlier version of the system
+## Disclaimer
 
-    package.json
-    package-lock.json
-    README.md
-
-Project Objective
-
-The objective of BSOMS is to develop a practical software solution for managing common bakery operations while exploring frontend development, backend development, database handling, and full-stack application development.
-
-Note
-
-BSOMS is a college project developed with the assistance of AI tools for learning, experimentation, and rapid prototyping. It represents an evolving prototype rather than a production-ready commercial bakery management system.
+BSOMS was developed as a college project with AI-assisted workflows for learning and rapid prototyping. It is an evolving academic project and not positioned as a production-ready commercial system.
