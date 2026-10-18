@@ -1,4 +1,4 @@
-# BSOMS — Bakery Shop Owner Management System
+# BSOMS — Bakery Smart Operations Management System
 
 BSOMS is a full-stack web application designed to help small bakery businesses manage everyday operations from a single platform. It brings inventory, billing, customer credit, expiry tracking, worker management, waste monitoring, and shelf organization together in one system.
 
