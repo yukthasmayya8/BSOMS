@@ -2,7 +2,7 @@
 
 BSOMS is a full-stack web application designed to help small bakery businesses manage everyday operations from a single platform. It brings inventory, billing, customer credit, expiry tracking, worker management, waste monitoring, and shelf organization together in one system.
 
-> **Project status:** BSOMS is an educational prototype developed as a team project for the **Introduction to Design Thinking (IDT) course during the first year of engineering**. The project was created for learning, experimentation, and demonstrating software-development concepts.
+> **Project status:** BSOMS is an educational prototype developed as a team project for the **Introduction to Design Thinking (IDT) project during the first year of engineering**. The application was created for learning, experimentation, and demonstrating software-development concepts.
 
 ## Overview
 
@@ -29,20 +29,35 @@ BSOMS addresses these challenges through a centralized client-server application
 - **Database:** NeDB with persistent local data files
 - **Development tools:** ESLint and Concurrently
 
-## Academic Context
+## Academic Context and Team
 
-BSOMS was developed as a **team project for the Introduction to Design Thinking (IDT) course during the first year of engineering**.
+BSOMS was developed as a **team project for the Introduction to Design Thinking (IDT) project during the first year of engineering**.
 
-The project followed a problem-oriented approach to understand common challenges faced by small bakery businesses and design a practical software solution for organizing their daily operations.
+The project team consisted of:
+
+- **Yuktha S. Mayya**
+- **Aadhya Adiga**
+- **Abhishek Moolya**
+- **Adarsh**
+- **Anantheshwara Somayaji**
+- **Nikhil V. Shetty**
+
+Together, the team explored the operational challenges faced by small bakery businesses and designed a practical software solution to organize their daily activities.
 
 ## AI-Assisted Development
 
-Development of BSOMS was supported by AI-assisted tools, including:
+BSOMS was developed with assistance from **Google Gemini** and **StackBlitz AI**.
 
-- **Google Gemini** — Used for ideation, problem-solving, code assistance, and exploring implementation approaches.
-- **StackBlitz AI** — Used for project prototyping, development assistance, and improving the application workflow.
+These tools supported the development process through:
 
-AI tools were used as development assistants rather than substitutes for the project team's design decisions, implementation, testing, and review. All generated suggestions and code were reviewed and adapted by the team based on the project's requirements.
+- Project ideation and problem exploration
+- Feature planning and implementation guidance
+- Code-generation assistance
+- Prototyping and development support
+- Debugging and refinement
+- Documentation assistance
+
+AI tools were used as development assistants rather than substitutes for the project team's design decisions, implementation, testing, and review. The team reviewed and adapted AI-assisted suggestions and generated code according to the project's requirements.
 
 ## Project Structure
 
